@@ -21,7 +21,7 @@ export default function AdminLogin({ onLogin }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Login failed");
 
-      localStorage.setItem("token", data.token);
+      // localStorage.setItem("token", data.token);
       onLogin();
     } catch (err) {
       setError(err.message);

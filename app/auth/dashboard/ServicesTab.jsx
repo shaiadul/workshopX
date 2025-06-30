@@ -6,8 +6,14 @@ export default function ServicesTab() {
   const [form, setForm] = useState({ title: "", description: "" });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState(null);
 
-  const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+    }
+  }, []);
 
   useEffect(() => {
     fetchServices();

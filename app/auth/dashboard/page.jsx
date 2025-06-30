@@ -4,7 +4,7 @@ import ServicesTab from "./ServicesTab";
 import BlogsTab from "./BlogsTab";
 import ContactsTab from "./ContactsTab";
 
-export default function AdminDashboard({ onLogout }) {
+export default function AdminDashboard({  }) {
   const [activeTab, setActiveTab] = useState("services");
 
   return (
@@ -12,7 +12,7 @@ export default function AdminDashboard({ onLogout }) {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Admin Panel</h1>
         <button
-          onClick={onLogout}
+          // onClick={onLogout}
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
         >
           Logout

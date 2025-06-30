@@ -5,8 +5,14 @@ export default function ContactsTab() {
   const [contacts, setContacts] = useState([]);
   const [replyMap, setReplyMap] = useState({}); // { contactId: replyText }
   const [loadingReply, setLoadingReply] = useState(null);
+  const [token, setToken] = useState(null);
 
-  const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+    }
+  }, []);
 
   useEffect(() => {
     fetchContacts();
