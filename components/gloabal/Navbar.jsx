@@ -15,7 +15,7 @@ export default function Navbar() {
     { label: "Home", href: "/" },
     { label: "Blogs", href: "/blogs" },
     { label: "Services", href: "/services" },
-    { label: "Team", href: "/#team" },
+    { label: "Offers", href: "/offers" },
     { label: "Contact", href: "/#contact" },
   ];
 
@@ -60,6 +60,8 @@ export default function Navbar() {
               const isActive =
                 (item.href === "/" && pathname === "/") ||
                 (item.href === "/blogs" && pathname.startsWith("/blogs")) ||
+                (item.href === "/services" && pathname.startsWith("/services")) ||
+                (item.href === "/offers" && pathname.startsWith("/offers")) ||
                 (item.href.startsWith("/#") && pathname === "/");
 
               return (

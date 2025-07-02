@@ -1,9 +1,10 @@
 "use client";
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import SortDropdown from "./SortDropdown";
 
 export default function BlogPage() {
   useEffect(() => {
@@ -114,7 +115,6 @@ export default function BlogPage() {
     },
   ];
 
-  // State hooks
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
 
@@ -122,7 +122,6 @@ export default function BlogPage() {
     return new Date(dateStr);
   };
 
-  // Filter and sort logic
   const filteredBlogs = blogs
     .filter(
       (blog) =>
@@ -139,7 +138,6 @@ export default function BlogPage() {
 
   return (
     <div className="px-4 py-10 container mx-auto">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -150,17 +148,17 @@ export default function BlogPage() {
         <h2 data-aos="fade-right" className="text-3xl font-bold text-slate-900">
           Our Latest Blog Posts
         </h2>
-        <p data-aos="fade-left" className="text-slate-600 mt-4 max-w-2xl mx-auto">
+        <p
+          data-aos="fade-left"
+          className="text-slate-600 mt-4 max-w-2xl mx-auto"
+        >
           Stay up to date with web development trends, UX insights, and
           tutorials.
         </p>
       </motion.div>
 
-      {/* Search & Sort Controls */}
       <div className="relative mb-10">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-400 via-blue-500 to-teal-600 rounded-xl transform -skew-y-1"></div>
-        <div className="relative bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-6 flex flex-col md:flex-row gap-4 items-center justify-between border border-gray-200">
-          {/* Search Input */}
+        <div className="relative overflow-visible bg-white/80 backdrop-blur-md rounded-xl shadow-lg p-6 flex flex-col md:flex-row gap-4 items-center justify-between border border-gray-200">
           <div className="relative w-full md:w-2/3 lg:w-1/2">
             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
               <svg
@@ -181,37 +179,34 @@ export default function BlogPage() {
               className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400 transition-all duration-300"
             />
           </div>
-
-          {/* Sort Dropdown */}
-          <div className="w-full md:w-auto">
-            <select
-              value={sortOrder}
-              onChange={(e) => setSortOrder(e.target.value)}
-              className="w-full md:w-48 p-3 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-teal-400 appearance-none bg-no-repeat bg-[right_1rem_center] bg-[url('data:image/svg+xml;utf8,<svg fill=\'%236B7280\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5H7z\'/></svg>')] pr-10"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
+          <div className="relative z-50 w-full md:w-40">
+            <SortDropdown sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </div>
         </div>
       </div>
 
-      {/* Blog Cards Grid */}
+      <div>
+        <h4 className="text-slate-600 text-md">
+          Total <strong>{filteredBlogs.length}</strong> results found for <strong>{searchTerm ? searchTerm : "Now"}</strong>
+        </h4>
+      </div>
+
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {filteredBlogs.length > 0 ? (
-          filteredBlogs.map((blog, index) => (
-            <Link href={`/blogs/${blog.id}`}>
+          filteredBlogs?.map((blog, index) => (
+            <Link key={index} href={`/blogs/${blog.id}`}>
               <div
                 key={blog.id}
                 custom={index}
                 data-aos="fade-up"
                 data-aos-delay={index * 100}
-                className="bg-white border border-teal-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300"
+                className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-700"
               >
                 <img
-                  src={blog.image}
+                  // src={blog.image}
+                  src="https://static.vecteezy.com/system/resources/previews/051/824/613/non_2x/water-pump-icon-design-template-simple-and-clean-vector.jpg"
                   alt={blog.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-full object-cover"
                 />
                 <div className="p-5">
                   <h3 className="text-lg font-semibold text-slate-900 line-clamp-2">

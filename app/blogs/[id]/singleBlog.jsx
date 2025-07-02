@@ -16,7 +16,8 @@ export default function SingleBlog({ blog }) {
       </p>
       <img
         data-aos="zoom-in-up"
-        src={blog.image}
+        // src={blog.image}
+        src="https://static.vecteezy.com/system/resources/previews/051/824/613/non_2x/water-pump-icon-design-template-simple-and-clean-vector.jpg"
         alt={blog.title}
         className="w-full h-[600px] rounded-lg mb-6"
       />

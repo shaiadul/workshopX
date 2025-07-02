@@ -123,7 +123,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function BlogDetails({ params }) {
+export default async function BlogDetails({ params }) {
   const blog = blogs.find((b) => b.id === parseInt(params.id));
 
   if (!blog) {
