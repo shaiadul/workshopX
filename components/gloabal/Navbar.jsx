@@ -97,7 +97,7 @@ export default function Navbar() {
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-md lg:hidden z-10"
+                className="absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-md lg:hidden z-50"
               >
                 <ul className="flex flex-col p-4 space-y-3">
                   {navItems.map((item) => {

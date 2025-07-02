@@ -5,6 +5,8 @@ import "aos/dist/aos.css";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import SortDropdown from "./SortDropdown";
+import Loading from "../loading";
+
 
 export default function BlogPage() {
   useEffect(() => {

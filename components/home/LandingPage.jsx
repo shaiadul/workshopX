@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
 import {
   FaWrench,
   FaUserFriends,
@@ -35,9 +36,21 @@ const images = [
   pic03,
 ];
 const testimonials = [
-  "Fast and reliable service. Very happy with the professionalism!",
-  "Great experience, friendly staff and quick turnaround.",
-  "Affordable and trustworthy. Highly recommend!",
+  {
+    id: 1,
+    name: "John Doe",
+    comment: "Excellent work, fast and efficient. Highly recommended!",
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    comment: "Fast and reliable service. Very happy with the professionalism!",
+  },
+  {
+    id: 3,
+    name: "Michael Johnson",
+    comment: "Great experience, friendly staff and quick turnaround.",
+  },
 ];
 
 const heroBullets = [
@@ -97,7 +110,7 @@ export default function LandingPage() {
   return (
     <main className="font-sans text-gray-800 overflow-x-hidden">
       <section className="relative w-full h-[600px] overflow-hidden">
-        <div className="absolute inset-0 transition-all duration-700 ease-in-out">
+        {/* <div className="absolute inset-0 transition-all duration-700 ease-in-out">
           <Image
             src={images[currentIndex]}
             alt={`Slide ${currentIndex}`}
@@ -107,7 +120,27 @@ export default function LandingPage() {
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent z-10"></div>
-        </div>
+        </div> */}
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 1, scale: 1.03 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0.9, scale: 1.03 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="absolute inset-0 w-full h-full"
+          >
+            <Image
+              src={images[currentIndex]}
+              alt={`Slide ${currentIndex}`}
+              fill
+              priority
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10"></div>
+          </motion.div>
+        </AnimatePresence>
 
         <div className="relative z-20 flex flex-col items-center justify-center h-full text-center text-white px-4">
           <h1
@@ -717,7 +750,8 @@ export default function LandingPage() {
             className="relative w-full md:w-1/3 h-72 md:h-96 rounded-xl overflow-hidden shadow-lg order-first md:order-last"
           >
             <Image
-              src={boss}
+              // src={boss}
+              src="https://i.pravatar.cc/100?img=2"
               alt="Chairman"
               fill
               className="object-cover"
@@ -733,15 +767,21 @@ export default function LandingPage() {
             What Our Clients Say
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {testimonials.map((text, i) => (
+            {testimonials.map((data, i) => (
               <div
                 key={i}
                 data-aos="zoom-in"
                 className="bg-white snap-center min-w-[300px] p-6 rounded-xl shadow hover:shadow-lg transition"
               >
-                <p className="italic text-gray-700 mb-4">“{text}”</p>
+                <p className="italic text-gray-700">“{data.comment}”</p>
+
+                <img
+                  src={`https://i.pravatar.cc/100?img=${i + 1}`}
+                  alt={`Customer ${i + 1}`}
+                  className="w-14 h-14 flex mx-auto rounded-full mb-4 object-cover my-5"
+                />
                 <p className="font-semibold text-teal-700 flex items-center justify-center gap-1">
-                  <FaUserFriends /> Customer #{i + 1}
+                  {data.name}
                 </p>
               </div>
             ))}
