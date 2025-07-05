@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function EmailVerifiedPage() {
   return (
-    <main className="max-w-2xl mx-auto py-16 px-4 text-center">
+    <main className="max-w-2xl mx-auto py-48 px-4 text-center">
       <h1 className="text-3xl font-bold text-teal-600 mb-4">
         Email Verified Successfully 🎉
       </h1>
