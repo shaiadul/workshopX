@@ -37,7 +37,7 @@ export default function AdminSignup({}) {
       if (!res.token) throw new Error(result.message || "Signup failed");
       if (res.token) {
         localStorage.setItem("token", res.token);
-        console.log("result", result);
+        // console.log("result", result);
         setLoginData((prev) => ({
           ...prev,
           loading: false,

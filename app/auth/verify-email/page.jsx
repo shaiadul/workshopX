@@ -16,6 +16,7 @@ export default function VerifyEmail() {
       try {
         const res = await fetchApi(`/auth/verify-email?token=${token}`, "GET");
         const result = res;
+        console.log("result", result);
         setStatus({ loading: false, message: result.message || "Email verified successfully!" });
         // router.push("/auth/adminlogin");
       } catch (err) {
