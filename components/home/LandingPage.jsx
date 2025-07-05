@@ -26,6 +26,8 @@ import contact from "@/public/assets/contact.jpg";
 import contactSvg from "@/public/assets/contactSvg.png";
 import boss from "@/public/assets/boss.jpg";
 import ClientLogoMarquee from "./ClientLogoMarquee";
+import { fetchServices } from "@/redux/slice/serviceSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const images = [
   // "https://www.shutterstock.com/image-photo/inside-car-workshop-cars-on-600nw-2469499053.jpg",
@@ -67,6 +69,13 @@ export default function LandingPage() {
   const [type, setType] = useState("business");
 
   const scrollRef = useRef();
+
+  const dispatch = useDispatch();
+  const { list, loading, error } = useSelector((state) => state.services);
+
+  useEffect(() => {
+    dispatch(fetchServices());
+  }, [dispatch]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -110,18 +119,6 @@ export default function LandingPage() {
   return (
     <main className="font-sans text-gray-800 overflow-x-hidden">
       <section className="relative w-full h-[600px] overflow-hidden">
-        {/* <div className="absolute inset-0 transition-all duration-700 ease-in-out">
-          <Image
-            src={images[currentIndex]}
-            alt={`Slide ${currentIndex}`}
-            fill
-            priority
-            className="object-cover transition-opacity duration-700"
-          />
-
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent z-10"></div>
-        </div> */}
-
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -283,29 +280,23 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              "Decile Pump Repair",
-              "Engine Repair",
-              "Brake Service",
-              "AC Maintenance",
-              "Oil Change",
-              "Car Wash",
-            ].map((service) => (
+            {list?.map((service, idx) => (
               <motion.div
-                key={service}
+                key={idx}
                 whileHover={{ scale: 1.03 }}
                 data-aos="fade-up"
                 className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
               >
-                {/* <FaWrench className="text-teal-600 text-3xl mb-4" /> */}
-                <img
-                  src="https://static.vecteezy.com/system/resources/previews/051/824/613/non_2x/water-pump-icon-design-template-simple-and-clean-vector.jpg"
-                  className="w-32 shrink-0"
-                  alt="brand-logo1"
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  width={100}
+                  height={100}
+                  className="w-[100px] h-[100px] object-cover flex  rounded-lg mb-4"
                 />
-                <h4 className="font-bold text-xl mb-2">{service}</h4>
+                <h4 className="font-bold text-xl mb-2">{service.title}</h4>
                 <p className="text-sm text-gray-600">
-                  Premium {service.toLowerCase()} by certified professionals.
+                  Premium {service.title.toLowerCase()} by certified professionals.
                 </p>
               </motion.div>
             ))}

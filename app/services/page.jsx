@@ -4,54 +4,32 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchServices } from "@/redux/slice/serviceSlice";
+import Image from "next/image";
 
-const services = [
-  {
-    title: "Web Development",
-    description:
-      "Custom websites and web applications tailored to your business needs, using the latest technologies like React, Next.js, and Node.js.",
-    icon: "🌐",
-  },
-  {
-    title: "Mobile App Development",
-    description:
-      "Build intuitive, high-performance mobile apps for Android and iOS using cross-platform frameworks like Flutter and React Native.",
-    icon: "📱",
-  },
-  {
-    title: "UI/UX Design",
-    description:
-      "Craft engaging user interfaces and seamless user experiences through design thinking, wireframing, and prototyping.",
-    icon: "🎨",
-  },
-  {
-    title: "E-commerce Solutions",
-    description:
-      "End-to-end e-commerce development including store setup, product management, secure payments, and performance optimization.",
-    icon: "🛒",
-  },
-  {
-    title: "SEO & Digital Marketing",
-    description:
-      "Improve your website visibility and rankings with data-driven SEO, SEM, and targeted digital marketing strategies.",
-    icon: "📈",
-  },
-  {
-    title: "Maintenance & Support",
-    description:
-      "Ongoing support, bug fixes, and performance enhancements to keep your website or app secure and up to date.",
-    icon: "🛠️",
-  },
-];
 
 export default function ServicesPage() {
+  const dispatch = useDispatch();
+  const { list, loading, error } = useSelector((state) => state.services);
+
+  useEffect(() => {
+    dispatch(fetchServices());
+  }, [dispatch]);
+
   useEffect(() => {
     AOS.init({ duration: 800, once: true });
   }, []);
+  console.log("list services", list);
   return (
     <div className="max-w-7xl mx-auto px-4 py-20">
       <div className="text-center mb-16">
-        <h2 data-aos="fade-right" className="text-4xl font-bold text-slate-900 mb-4">Our Services</h2>
+        <h2
+          data-aos="fade-right"
+          className="text-4xl font-bold text-slate-900 mb-4"
+        >
+          Our Services
+        </h2>
         <p data-aos="fade-left" className="text-slate-600 max-w-2xl mx-auto">
           Discover how we help businesses build scalable and innovative
           solutions with our range of development and design services.
@@ -59,7 +37,7 @@ export default function ServicesPage() {
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {services.map((service, idx) => (
+        {list?.map((service, idx) => (
           <motion.div
             key={idx}
             className="p-6 rounded-xl shadow-md bg-white border border-slate-200 hover:shadow-xl transition duration-300"
@@ -68,7 +46,13 @@ export default function ServicesPage() {
             transition={{ duration: 0.5, delay: idx * 0.1 }}
             viewport={{ once: true }}
           >
-            <div className="text-4xl mb-4">{service.icon}</div>
+            <Image
+              src={service.image}
+              alt={service.title}
+              width={100}
+              height={100}
+              className="w-[100px] h-[100px] object-cover flex  rounded-lg mb-4"
+            />
             <h4 className="text-xl font-semibold text-slate-900 mb-2">
               {service.title}
             </h4>
