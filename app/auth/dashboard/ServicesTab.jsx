@@ -1,37 +1,42 @@
 "use client";
+import { fetchApi } from "@/utils/FetchApi";
+import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 
 export default function ServicesTab() {
   const [services, setServices] = useState([]);
-  const [form, setForm] = useState({ title: "", description: "" });
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    image: null,
+    createdBy: "",
+  });
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [token, setToken] = useState(null);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("token");
-      setToken(storedToken);
-    }
-  }, []);
+  const user = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     fetchServices();
-  }, []);
+  }, [loading]);
 
   async function fetchServices() {
-    const res = await fetch("/api/services", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
+    const res = await fetchApi("/services/", "GET");
+    if (res) {
+      const data = await res;
       setServices(data);
     }
   }
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setForm((prev) => ({ ...prev, image: files[0] }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+  };
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -39,24 +44,38 @@ export default function ServicesTab() {
 
     try {
       const method = editId ? "PUT" : "POST";
-      const url = editId ? `/api/services/${editId}` : "/api/services";
+      const url = editId ? `/services/${editId}` : "/services/create-service";
 
-      const res = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(form),
-      });
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("description", form.description);
+      if (form.image) {
+        formData.append("image", form.image);
+      }
+      const userId =
+        user?._id ||
+        (typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("userInfo"))?._id
+          : null);
 
-      if (!res.ok) throw new Error("Failed");
+      if (!userId) {
+        alert("User not logged in");
+        setLoading(false);
+        return;
+      }
 
-      setForm({ title: "", description: "" });
+      formData.append("createdBy", userId);
+
+      const res = await fetchApi(url, method, formData);
+
+      if (res) throw new Error("Failed");
+
+      setForm({ title: "", description: "", image: null, createdBy: "" });
       setEditId(null);
       fetchServices();
+      setLoading(false);
     } catch (err) {
-      alert(err.message);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -64,17 +83,28 @@ export default function ServicesTab() {
 
   async function handleDelete(id) {
     if (!confirm("Delete this service?")) return;
-    await fetch(`/api/services/${id}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    await fetchApi(`/services/${id}`, "DELETE");
+    setForm((prev) => ({
+      ...prev,
+      image: null,
+      createdBy: "",
+      title: "",
+      description: "",
+    }));
     fetchServices();
   }
 
   function handleEdit(service) {
-    setForm({ title: service.title, description: service.description });
+    setForm({
+      title: service.title,
+      description: service.description,
+      createdBy: service.createdBy,
+      image: null,
+    });
     setEditId(service._id);
   }
+
+  // console.log("services", services);
 
   return (
     <div>
@@ -87,6 +117,15 @@ export default function ServicesTab() {
           onChange={handleChange}
           className="w-full border p-2 rounded"
           required
+        />
+        <input
+          name="image"
+          type="file"
+          accept="image/*"
+          placeholder="Image insert here"
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+          required={editId ? false : true}
         />
         <textarea
           name="description"
@@ -101,7 +140,13 @@ export default function ServicesTab() {
           disabled={loading}
           className="bg-teal-600 text-white px-4 py-2 rounded"
         >
-          {editId ? "Update Service" : "Add Service"}
+          {loading
+            ? editId
+              ? "Updating..."
+              : "Adding..."
+            : editId
+            ? "Update Service"
+            : "Add Service"}
         </button>
         {editId && (
           <button
@@ -110,7 +155,7 @@ export default function ServicesTab() {
               setEditId(null);
               setForm({ title: "", description: "" });
             }}
-            className="ml-2 px-4 py-2 rounded border border-gray-400"
+            className="ml-2 px-4 py-2 rounded bg-red-600 text-white"
           >
             Cancel
           </button>
@@ -118,14 +163,24 @@ export default function ServicesTab() {
       </form>
 
       <ul className="space-y-3">
-        {services.map((service) => (
+        {!services?.length && <p>No services found.</p>}
+        {services?.map((service) => (
           <li
             key={service._id}
             className="border rounded p-4 flex justify-between items-start"
           >
-            <div>
-              <h3 className="font-semibold">{service.title}</h3>
-              <p>{service.description}</p>
+            <div className="flex ">
+              <Image
+                src={service.image}
+                alt={service.title}
+                width={300}
+                height={300}
+                className="w-28 h-28 object-cover mr-4"
+              />
+              <div>
+                <h3 className="font-semibold">{service.title}</h3>
+                <p>{service.description}</p>
+              </div>
             </div>
             <div className="space-x-2">
               <button

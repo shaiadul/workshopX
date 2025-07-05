@@ -7,14 +7,25 @@ export const fetchApi = async (path, method, data = null) => {
   const url = `${API_ENDPOINT}${path}`;
   let token = "";
   if (typeof window !== "undefined") {
-    token = localStorage.getItem("accessToken") || "";
+    token = localStorage.getItem("token") || "";
   }
 
   try {
     let response;
+    // const config = {
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // };
+    const isFormData =
+      typeof FormData !== "undefined" && data instanceof FormData;
+
     const config = {
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData
+          ? {} 
+          : { "Content-Type": "application/json" }),
         Authorization: `Bearer ${token}`,
       },
     };
