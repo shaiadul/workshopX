@@ -1,19 +1,22 @@
 "use client";
 import { fetchApi } from "@/utils/FetchApi";
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function ChangePassword() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [resetData, setResetData] = useState({
     password: "",
     loading: false,
     error: "",
-    massage: "",
+    message: "",
   });
 
-  const { password, massage, loading, error } = resetData;
-
-  const router = useRouter();
+  const { password, loading, error, message } = resetData;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,35 +26,42 @@ export default function ChangePassword() {
       return;
     }
 
+    if (!token) {
+      setResetData((prev) => ({ ...prev, error: "Token missing" }));
+      return;
+    }
+
     try {
       setResetData((prev) => ({
         ...prev,
         loading: true,
         error: "",
-        massage: "",
+        message: "",
       }));
-      const res = await fetchApi("/auth/change-password", "POST", {
-        password: resetData.password,
-      });
 
-      const data = await res;
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`,
+        { password },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      if (!data.message) {
-        throw new Error(data.message || "Failed to reset password");
-      }
+      setResetData((prev) => ({
+        ...prev,
+        loading: false,
+        message: res.message || "Password changed successfully",
+      }));
 
-      if (data.massage) {
-        setResetData((prev) => ({
-          ...prev,
-          loading: false,
-          massage: data.massage || "Password changed successfully",
-        }));
-        router.push("/auth/adminlogin");
-      }
+      router.push("/auth/adminlogin");
     } catch (err) {
-      setResetData((prev) => ({ ...prev, error: err.message }));
-    } finally {
-      setResetData((prev) => ({ ...prev, loading: false }));
+      setResetData((prev) => ({
+        ...prev,
+        loading: false,
+        error: err.response?.message || err.message || "Something went wrong",
+      }));
     }
   };
 
