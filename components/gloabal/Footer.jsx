@@ -44,10 +44,10 @@ export default function Footer () {
               <h2 className="inline-block text-2xl pb-4 mb-4 border-b-4 border-teal-600">Company</h2>
             </div>
             <ul className="leading-8">
-              <li><a href="#" className="hover:text-teal-400">About Us</a></li>
-              <li><a href="#" className="hover:text-teal-400">Terms &amp; Conditions</a></li>
-              <li><a href="#" className="hover:text-teal-400">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-teal-400">Contact Us</a></li>
+              <li><a href="/blogs" className="hover:text-teal-400">Blogs</a></li>
+              <li><a href="/terms-and-conditions" className="hover:text-teal-400">Terms &amp; Conditions</a></li>
+              <li><a href="/privacy-policy" className="hover:text-teal-400">Privacy Policy</a></li>
+              <li><a href="/#contact" className="hover:text-teal-400">Contact Us</a></li>
             </ul>
           </div>
           <div className="px-4 my-4 w-full sm:w-auto">
