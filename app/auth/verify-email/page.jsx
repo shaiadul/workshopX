@@ -9,7 +9,7 @@ export default function VerifyEmail() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
 
-  const router = useRouter();
+//   const router = useRouter();
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -17,7 +17,7 @@ export default function VerifyEmail() {
         const res = await fetchApi(`/auth/verify-email?token=${token}`, "GET");
         const result = res.data;
         setStatus({ loading: false, message: result.message || "Email verified successfully!" });
-        router.push("/auth/adminlogin");
+        // router.push("/auth/adminlogin");
       } catch (err) {
         const message = err.response?.data?.message || "Verification failed!";
         setStatus({ loading: false, message });
