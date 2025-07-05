@@ -1,7 +1,7 @@
 "use client";
 import { fetchApi } from "@/utils/FetchApi";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function ChangePassword() {
@@ -16,7 +16,7 @@ export default function ChangePassword() {
     message: "",
   });
 
-  const { password, loading, error, message } = resetData;
+  const { password, loading, error, massage } = resetData;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,7 +40,7 @@ export default function ChangePassword() {
       }));
 
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/change-password`,
+        `${process.env.NEXT_PUBLIC_API_ENDPOINT}/auth/change-password`,
         { password },
         {
           headers: {
@@ -48,6 +48,8 @@ export default function ChangePassword() {
           },
         }
       );
+
+      console.log("change res", res);
 
       setResetData((prev) => ({
         ...prev,
@@ -68,7 +70,7 @@ export default function ChangePassword() {
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow-lg my-40">
       <h2 className="text-2xl mb-4 text-center font-semibold">
-        Change Old Password
+        Set New Password
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -82,13 +84,13 @@ export default function ChangePassword() {
           required
         />
         {resetData.error && (
-          <div className="text-red-600 text-sm text-center">
+          <div className="text-red-600 text-sm text-left">
             {resetData.error}
           </div>
         )}
-        {resetData.massage && (
-          <div className="text-teal-600 text-sm text-center">
-            {resetData.massage}
+        {resetData.message && (
+          <div className="text-teal-600 text-sm text-left">
+            {resetData.message}
           </div>
         )}
         <button
