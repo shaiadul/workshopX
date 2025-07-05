@@ -1,43 +1,54 @@
 "use client";
+import { setUser } from "@/redux/slice/authSlice";
+import { fetchApi } from "@/utils/FetchApi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 
-export default function AdminLogin({ onLogin }) {
-  
-
+export default function AdminLogin() {
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
     loading: false,
     error: "",
-  })
-
-
+  });
 
   const { email, password, loading, error } = loginData;
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoginData((prev) => ({ ...prev, loading: true, error: "" }));
 
-    try {
-      const res = await fetch("/api/admin/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Login failed");
+    const data = {
+      email,
+      password,
+    };
 
-      // localStorage.setItem("token", data.token);
-      onLogin();
+    try {
+      setLoginData((prev) => ({ ...prev, loading: true, error: "" }));
+      const res = await fetchApi("/auth/login", "POST", data);
+      const result = await res;
+
+      if (!result.token) throw new Error(data.message || "Login failed");
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+        dispatch(setUser(result?.user));
+        setLoginData((prev) => ({
+          ...prev,
+          loading: false,
+          massage: result.message || "Login successfully",
+        }));
+        router.push("/auth/dashboard");
+      }
     } catch (err) {
       setLoginData((prev) => ({ ...prev, error: err.message }));
     } finally {
       setLoginData((prev) => ({ ...prev, loading: false }));
     }
   }
-
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow-lg my-40">
@@ -48,7 +59,9 @@ export default function AdminLogin({ onLogin }) {
           placeholder="email"
           className="w-full p-2 border rounded"
           value={loginData.email}
-          onChange={(e) => setLoginData((prev) => ({ ...prev, email: e.target.value }))}
+          onChange={(e) =>
+            setLoginData((prev) => ({ ...prev, email: e.target.value }))
+          }
           required
           autoFocus
         />
@@ -57,11 +70,15 @@ export default function AdminLogin({ onLogin }) {
           placeholder="Password"
           className="w-full p-2 border rounded"
           value={loginData.password}
-          onChange={(e) => setLoginData((prev) => ({ ...prev, password: e.target.value }))}
+          onChange={(e) =>
+            setLoginData((prev) => ({ ...prev, password: e.target.value }))
+          }
           required
         />
         {loginData.error && (
-          <div className="text-red-600 text-sm text-left">{loginData.error}</div>
+          <div className="text-red-600 text-sm text-left">
+            {loginData.error}
+          </div>
         )}
         <Link
           href="/auth/reset-password"
@@ -80,7 +97,10 @@ export default function AdminLogin({ onLogin }) {
         <div>
           <p className="text-center">
             Don't have an account?{" "}
-            <a href="/auth/adminsignup" className="text-teal-600 hover:underline">
+            <a
+              href="/auth/adminsignup"
+              className="text-teal-600 hover:underline"
+            >
               Sign up
             </a>
           </p>

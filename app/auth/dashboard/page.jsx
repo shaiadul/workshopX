@@ -1,18 +1,43 @@
 "use client";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import ServicesTab from "./ServicesTab";
 import BlogsTab from "./BlogsTab";
 import ContactsTab from "./ContactsTab";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { clearUser } from "@/redux/slice/authSlice";
+import OfferTab from "./OfferTab";
+import ProfileTab from "./ProfileTab";
+import UserTab from "./UserTab";
 
-export default function AdminDashboard({  }) {
+export default function AdminDashboard({}) {
   const [activeTab, setActiveTab] = useState("services");
+
+  const dispatch = useDispatch();
+
+  const user = useSelector((state) => state.auth.user);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const token =
+      typeof window !== "undefined" && localStorage.getItem("token");
+
+    if (!user || !token) {
+      router.push("/auth/adminlogin");
+    }
+  }, [user, dispatch]);
+
+  const onLogout = () => {
+    dispatch(clearUser());
+  };
 
   return (
     <div className="container mx-auto bg-white px-4 my-20">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Admin Panel</h1>
         <button
-          // onClick={onLogout}
+          onClick={onLogout}
           className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
         >
           Logout
@@ -24,6 +49,9 @@ export default function AdminDashboard({  }) {
           { key: "services", label: "Services" },
           { key: "blogs", label: "Blogs" },
           { key: "contacts", label: "Contacts" },
+          { key: "offer", label: "Offer" },
+          { key: "profile", label: "Profile" },
+          { key: "user", label: "User" },
         ].map(({ key, label }) => (
           <button
             key={key}
@@ -43,6 +71,9 @@ export default function AdminDashboard({  }) {
         {activeTab === "services" && <ServicesTab />}
         {activeTab === "blogs" && <BlogsTab />}
         {activeTab === "contacts" && <ContactsTab />}
+        {activeTab === "offer" && <OfferTab />}
+        {activeTab === "profile" && <ProfileTab />}
+        {activeTab === "user" && <UserTab />}
       </div>
     </div>
   );

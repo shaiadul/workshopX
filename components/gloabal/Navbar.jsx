@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaPhoneAlt, FaEnvelope } from "react-icons/fa";
 import { HiMenu, HiX } from "react-icons/hi";
 import Link from "next/link";
+import { useSelector } from "react-redux";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  const user = useSelector((state) => state.auth.user);
 
   const navItems = [
     { label: "Home", href: "/" },
@@ -18,6 +21,10 @@ export default function Navbar() {
     { label: "Offers", href: "/offers" },
     { label: "Contact", href: "/#contact" },
   ];
+
+  if (user?.email) {
+    navItems.push({ label: "Dashboard", href: "/auth/dashboard" });
+  }
 
   return (
     <header className="w-full shadow-md z-50">
@@ -60,8 +67,11 @@ export default function Navbar() {
               const isActive =
                 (item.href === "/" && pathname === "/") ||
                 (item.href === "/blogs" && pathname.startsWith("/blogs")) ||
-                (item.href === "/services" && pathname.startsWith("/services")) ||
+                (item.href === "/services" &&
+                  pathname.startsWith("/services")) ||
                 (item.href === "/offers" && pathname.startsWith("/offers")) ||
+                (item.href === "/auth/dashboard" &&
+                  pathname === "/auth/dashboard") ||
                 (item.href.startsWith("/#") && pathname === "/");
 
               return (

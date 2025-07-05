@@ -5,7 +5,6 @@ import Footer from "@/components/gloabal/Footer";
 import AnimatedLayout from "@/components/gloabal/AnimatedLayout";
 import { Providers } from "@/redux/providers";
 
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -28,9 +27,11 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AnimatedLayout>
-          <Navbar />
-          <Providers>{children}</Providers>
-          <Footer />
+          <Providers>
+            <Navbar />
+            {children}
+            <Footer />
+          </Providers>
         </AnimatedLayout>
       </body>
     </html>

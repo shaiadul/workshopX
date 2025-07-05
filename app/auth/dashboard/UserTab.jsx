@@ -1,0 +1,126 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+export default function UserTab() {
+  const [users, setUsers] = useState([]);
+  const [token, setToken] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [token]);
+
+  async function fetchUsers() {
+    if (!token) return;
+    try {
+      const res = await fetch("/api/users", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to fetch users");
+      const data = await res.json();
+      setUsers(data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    setLoadingId(id);
+    try {
+      const res = await fetch(`/api/users/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error("Failed to delete user");
+      alert("User deleted");
+      fetchUsers();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoadingId(null);
+    }
+  }
+
+  async function toggleActive(id, currentStatus) {
+    setLoadingId(id);
+    try {
+      const res = await fetch(`/api/users/${id}/status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ isActive: !currentStatus }),
+      });
+      if (!res.ok) throw new Error("Failed to update status");
+      alert("Status updated");
+      fetchUsers();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoadingId(null);
+    }
+  }
+
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">All Users</h2>
+      {users.length === 0 && <p>No users found.</p>}
+
+      <table className="w-full border-collapse border text-left">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Email</th>
+            <th className="p-2 border">Role</th>
+            <th className="p-2 border">Status</th>
+            <th className="p-2 border">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map(({ _id, name, email, role, isActive }) => (
+            <tr key={_id} className="border-b">
+              <td className="p-2 border">{name}</td>
+              <td className="p-2 border">{email}</td>
+              <td className="p-2 border">{role}</td>
+              <td className="p-2 border">
+                <span
+                  className={`px-2 py-1 rounded text-xs font-medium ${
+                    isActive ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"
+                  }`}
+                >
+                  {isActive ? "Active" : "Inactive"}
+                </span>
+              </td>
+              <td className="p-2 border space-x-2">
+                <button
+                  onClick={() => toggleActive(_id, isActive)}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded"
+                  disabled={loadingId === _id}
+                >
+                  {isActive ? "Deactivate" : "Activate"}
+                </button>
+                <button
+                  onClick={() => handleDelete(_id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded"
+                  disabled={loadingId === _id}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}

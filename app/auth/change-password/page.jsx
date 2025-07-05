@@ -1,14 +1,19 @@
 "use client";
+import { fetchApi } from "@/utils/FetchApi";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function ChangePassword( ) {
+export default function ChangePassword() {
   const [resetData, setResetData] = useState({
     password: "",
     loading: false,
     error: "",
+    massage: "",
   });
 
-  const { password, loading, error } = resetData;
+  const { password, massage, loading, error } = resetData;
+
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,30 +23,31 @@ export default function ChangePassword( ) {
       return;
     }
 
-    // Add your actual API call logic here
-    setResetData((prev) => ({ ...prev, loading: true, error: "" }));
-
     try {
-      // Example API call
-      const res = await fetch("/api/auth/change-password", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token: new URLSearchParams(window.location.search).get("token"),
-          password,
-        }),
+      setResetData((prev) => ({
+        ...prev,
+        loading: true,
+        error: "",
+        massage: "",
+      }));
+      const res = await fetchApi("/auth/change-password", "POST", {
+        password: resetData.password,
       });
 
-      const data = await res.json();
+      const data = await res;
 
-      if (!res.ok) {
+      if (!data.message) {
         throw new Error(data.message || "Failed to reset password");
       }
 
-      alert("Password changed successfully!");
-      // Redirect or handle success
+      if (data.massage) {
+        setResetData((prev) => ({
+          ...prev,
+          loading: false,
+          massage: data.massage || "Password changed successfully",
+        }));
+        router.push("/auth/adminlogin");
+      }
     } catch (err) {
       setResetData((prev) => ({ ...prev, error: err.message }));
     } finally {
@@ -51,18 +57,29 @@ export default function ChangePassword( ) {
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded shadow-lg my-40">
-      <h2 className="text-2xl mb-4 text-center font-semibold">Reset Password</h2>
+      <h2 className="text-2xl mb-4 text-center font-semibold">
+        Change Old Password
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="password"
           placeholder="Enter New Password"
           className="w-full p-2 border rounded"
           value={resetData.password}
-          onChange={(e) => setResetData((prev) => ({ ...prev, password: e.target.value }))}
+          onChange={(e) =>
+            setResetData((prev) => ({ ...prev, password: e.target.value }))
+          }
           required
         />
-        {error && (
-          <div className="text-red-600 text-sm text-center">{error}</div>
+        {resetData.error && (
+          <div className="text-red-600 text-sm text-center">
+            {resetData.error}
+          </div>
+        )}
+        {resetData.massage && (
+          <div className="text-teal-600 text-sm text-center">
+            {resetData.massage}
+          </div>
         )}
         <button
           type="submit"

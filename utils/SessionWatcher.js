@@ -18,7 +18,7 @@ export default function SessionWatcher() {
         const timeout = setTimeout(() => {
           dispatch(clearUser());
           alert("Session expired. Please login again.");
-          router.push("/auth/signin");
+          router.push("/auth/adminlogin");
         }, remaining);
         return () => clearTimeout(timeout);
       } else {

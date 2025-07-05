@@ -58,7 +58,7 @@ export default function BlogsTab() {
   };
 
   return (
-    <div className="p-4">
+    <div className="">
       <h2 className="text-2xl font-bold mb-4">Manage Blogs</h2>
 
       {/* Blog Form */}
