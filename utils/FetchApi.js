@@ -12,20 +12,12 @@ export const fetchApi = async (path, method, data = null) => {
 
   try {
     let response;
-    // const config = {
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // };
     const isFormData =
       typeof FormData !== "undefined" && data instanceof FormData;
 
     const config = {
       headers: {
-        ...(isFormData
-          ? {} 
-          : { "Content-Type": "application/json" }),
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         Authorization: `Bearer ${token}`,
       },
     };
@@ -38,7 +30,7 @@ export const fetchApi = async (path, method, data = null) => {
         response = await axios.post(url, data, config);
         break;
       case "PATCH":
-        response = await axios.patch(url, data, config);
+        response = await axios.patch(url, data ?? {}, config);
         break;
       case "PUT":
         response = await axios.put(url, data, config);
@@ -53,6 +45,6 @@ export const fetchApi = async (path, method, data = null) => {
     return response.data;
   } catch (error) {
     console.error(error);
-    notFound();
+    // notFound();
   }
 };

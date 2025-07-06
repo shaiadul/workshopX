@@ -23,7 +23,10 @@ export default function AdminDashboard({}) {
     const token =
       typeof window !== "undefined" && localStorage.getItem("token");
 
-    if (!user || !token) {
+    const userX =
+      typeof window !== "undefined" && JSON.parse(localStorage.getItem("userInfo"));
+
+    if (!user || !token || !userX) {
       router.push("/auth/adminlogin");
     }
   }, [user, dispatch]);

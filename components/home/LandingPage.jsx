@@ -28,15 +28,9 @@ import boss from "@/public/assets/boss.jpg";
 import ClientLogoMarquee from "./ClientLogoMarquee";
 import { fetchServices } from "@/redux/slice/serviceSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchApi } from "@/utils/FetchApi";
 
-const images = [
-  // "https://www.shutterstock.com/image-photo/inside-car-workshop-cars-on-600nw-2469499053.jpg",
-  // "https://plus.unsplash.com/premium_photo-1677009835876-4a29ddc4cc2c?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8dG9vbHN8ZW58MHx8MHx8fDA%3D",
-  // "https://cdn.pixabay.com/photo/2017/03/28/12/10/truck-2180064_1280.jpg",
-  pic01,
-  pic02,
-  pic03,
-];
+const images = [pic01, pic02, pic03];
 const testimonials = [
   {
     id: 1,
@@ -66,12 +60,21 @@ const heroBullets = [
 export default function LandingPage() {
   const [showButton, setShowButton] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [type, setType] = useState("business");
+  const [loading, setLoading] = useState(false);
+  const [type, setType] = useState("Business");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    purpose: type,
+    vehicleModel: "",
+    context: "",
+  });
 
   const scrollRef = useRef();
 
   const dispatch = useDispatch();
-  const { list, loading, error } = useSelector((state) => state.services);
+  const { list, error } = useSelector((state) => state.services);
 
   useEffect(() => {
     dispatch(fetchServices());
@@ -114,6 +117,36 @@ export default function LandingPage() {
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const res = await fetchApi("/contacts", "POST", form);
+
+      if (!res) throw new Error("Failed to submit");
+
+      setForm({
+        name: "",
+        email: "",
+        phone: "",
+        purpose: "business",
+        vehicleModel: "",
+        context: "",
+      });
+    } catch (err) {
+      console.log(err);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -281,24 +314,26 @@ export default function LandingPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {list?.map((service, idx) => (
-              <motion.div
-                key={idx}
-                whileHover={{ scale: 1.03 }}
-                data-aos="fade-up"
-                className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
-              >
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  width={100}
-                  height={100}
-                  className="w-[100px] h-[100px] object-cover flex  rounded-lg mb-4"
-                />
-                <h4 className="font-bold text-xl mb-2">{service.title}</h4>
-                <p className="text-sm text-gray-600">
-                  Premium {service.title.toLowerCase()} by certified professionals.
-                </p>
-              </motion.div>
+              <Link href={`/services/${service._id}`} key={idx}>
+                <motion.div
+                  whileHover={{ scale: 1.03 }}
+                  data-aos="fade-up"
+                  className="bg-white p-6 rounded-xl shadow hover:shadow-lg transition"
+                >
+                  <Image
+                    src={service.image}
+                    alt={service.title}
+                    width={100}
+                    height={100}
+                    className="w-[100px] h-[100px] object-cover flex  rounded-lg mb-4"
+                  />
+                  <h4 className="font-bold text-xl mb-2">{service.title}</h4>
+                  <p className="text-sm text-gray-600">
+                    Premium {service.title.toLowerCase()} by certified
+                    professionals.
+                  </p>
+                </motion.div>
+              </Link>
             ))}
           </div>
         </div>
@@ -371,8 +406,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="contact" className=" bg-teal-50">
-        <div className="container mx-auto px-4 w-full flex flex-col lg:flex-row items-stretch">
+      <section id="contact" className="bg-teal-50">
+        <div className="container mx-auto px-4 w-full flex flex-col lg:flex-row items-stretch overflow-x-hidden">
           <div className="relative w-full lg:w-1/2 h-80 lg:h-auto">
             <Image
               src={contactSvg}
@@ -383,43 +418,52 @@ export default function LandingPage() {
             />
           </div>
 
-          <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center 0">
-            <form className="w-full max-w-xl space-y-6">
+          <div className="w-full lg:w-1/2 p-6 lg:p-12 flex items-center justify-center">
+            <form className="w-full max-w-xl space-y-6" onSubmit={handleSubmit}>
               <h2 className="text-3xl font-bold text-gray-800">Get in Touch</h2>
 
               <div className="flex flex-col gap-4">
                 <input
                   type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Your Name"
-                  className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
+                  className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
                 <input
                   type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="Email"
-                  className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
+                  className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
                 <input
                   type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
                   placeholder="Phone Number"
-                  className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                   required
+                  className="border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
               </div>
 
               <div>
                 <label className="block mb-2 font-medium text-gray-700">
-                  Are you a Business or Private Individual ?
+                  Are you a Business or Private Individual?
                 </label>
                 <div className="flex gap-6">
                   <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      name="clientType"
-                      value="business"
-                      checked={type === "business"}
-                      onChange={() => setType("business")}
+                      name="purpose"
+                      value="Business"
+                      checked={form.purpose === "Business"}
+                      onChange={handleChange}
                       className="accent-teal-500 border-0"
                     />
                     <span>Business</span>
@@ -427,10 +471,10 @@ export default function LandingPage() {
                   <label className="flex items-center gap-2">
                     <input
                       type="radio"
-                      name="clientType"
-                      value="private"
-                      checked={type === "private"}
-                      onChange={() => setType("private")}
+                      name="purpose"
+                      value="Private"
+                      checked={form.purpose === "Private"}
+                      onChange={handleChange}
                       className="accent-teal-500 border-0"
                     />
                     <span>Private Individual</span>
@@ -440,21 +484,28 @@ export default function LandingPage() {
 
               <input
                 type="text"
+                name="vehicleModel"
+                value={form.vehicleModel}
+                onChange={handleChange}
                 placeholder="Model of Vehicle"
                 className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
               />
 
               <textarea
+                name="context"
+                value={form.context}
+                onChange={handleChange}
                 placeholder="Tell us more about your request..."
                 rows={4}
-                className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500"
-              ></textarea>
+                className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none"
+              />
 
               <button
                 type="submit"
+                disabled={loading}
                 className="w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 rounded-md transition duration-300"
               >
-                Submit Request
+                {loading ? "Submitting..." : "Submit Request"}
               </button>
             </form>
           </div>

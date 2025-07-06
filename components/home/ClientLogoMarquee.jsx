@@ -15,7 +15,7 @@ const logos = [
 export default function ClientLogoMarquee() {
   return (
     <section className="w-full bg-gray-50 py-20 overflow-hidden">
-      <div className="relative whitespace-nowrap flex animate-marquee gap-40">
+      <div className="relative whitespace-nowrap flex animate-marquee gap-20 md:gap-40">
         {[...logos, ...logos].map((logo, idx) => (
           <div
             key={idx}

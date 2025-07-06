@@ -1,9 +1,10 @@
 "use client";
+import { fetchApi } from "@/utils/FetchApi";
 import { useState, useEffect } from "react";
 
 export default function ContactsTab() {
   const [contacts, setContacts] = useState([]);
-  const [replyMap, setReplyMap] = useState({}); // { contactId: replyText }
+  const [replyMap, setReplyMap] = useState({});
   const [loadingReply, setLoadingReply] = useState(null);
   const [token, setToken] = useState(null);
 
@@ -15,22 +16,24 @@ export default function ContactsTab() {
   }, []);
 
   useEffect(() => {
-    fetchContacts();
-  }, []);
+    if (token) fetchContacts();
+  }, [token]);
 
   async function fetchContacts() {
-    const res = await fetch("/api/contacts", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (res.ok) {
-      const data = await res.json();
+    try {
+      const res = await fetchApi("/contacts", "GET");
+      if (!res) throw new Error("Failed to fetch contacts");
+      const data = await res;
       setContacts(data);
-      // Initialize reply map with existing replies
+
+      // Initialize replies
       const initialReplies = {};
       data.forEach((c) => {
         if (c.reply) initialReplies[c._id] = c.reply;
       });
       setReplyMap(initialReplies);
+    } catch (err) {
+      console.error(err.message);
     }
   }
 
@@ -45,13 +48,8 @@ export default function ContactsTab() {
     }
     setLoadingReply(id);
     try {
-      const res = await fetch(`/api/contacts/${id}/reply`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ reply: replyMap[id] }),
+      const res = await fetchApi(`/api/contacts/${id}/reply`, "PUT", {
+        reply: replyMap[id],
       });
       if (!res.ok) throw new Error("Failed to reply");
       alert("Reply saved");
@@ -63,47 +61,112 @@ export default function ContactsTab() {
     }
   }
 
+  async function handleMarkRead(id) {
+    try {
+      const res = await fetchApi(`/contacts/${id}/read`, "PATCH");
+      console.log(" read as read", res);
+      if (!res) throw new Error("Failed to mark as read");
+      fetchContacts();
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm("Are you sure you want to delete this message?")) return;
+    try {
+      const res = await fetchApi(`/contacts/${id}`, "DELETE");
+      fetchContacts();
+    } catch (err) {
+      console.log(err.message);
+    }
+  }
+
   return (
     <div>
       <h2 className="text-2xl font-semibold mb-4">Contact Messages</h2>
       {contacts.length === 0 && <p>No messages yet.</p>}
 
       <ul className="space-y-6">
-        {contacts.map(({ _id, name, email, message, reply, repliedAt, createdAt }) => (
-          <li key={_id} className="border p-4 rounded bg-gray-50">
-            <p>
-              <span className="font-semibold">From:</span> {name} ({email})
-            </p>
-            <p className="my-2 whitespace-pre-wrap">{message}</p>
+        {contacts.map((contact) => (
+          <li
+            key={contact._id}
+            className={`border p-4 rounded ${
+              contact.isRead ? "bg-gray-50" : "bg-yellow-50 border-yellow-400"
+            }`}
+          >
+            {!contact.isRead && (
+              <span className="inline-block bg-yellow-400 text-xs text-black font-bold px-2 py-0.5 rounded mb-2">
+                🕐 Unread
+              </span>
+            )}
+            {contact.isRead && (
+              <span className="inline-block bg-blue-400 text-xs text-black font-bold px-2 py-0.5 rounded mb-2">
+                🕐 Read
+              </span>
+            )}
 
-            <div>
-              <label className="block font-semibold mb-1" htmlFor={`reply-${_id}`}>
+            <p>
+              <span className="font-semibold">Name:</span> {contact.name} (
+              {contact.email})
+            </p>
+            <p className="text-sm text-gray-600 mb-1">
+              Phone: {contact.phone} | Purpose: {contact.purpose} | Vehicle:{" "}
+              {contact.vehicleModel}
+            </p>
+
+            <p className="my-2 whitespace-pre-wrap text-gray-800">
+              {contact.context}
+            </p>
+
+            <div className="space-y-2 mt-2">
+              <label
+                htmlFor={`reply-${contact._id}`}
+                className="block font-semibold"
+              >
                 Admin Reply
               </label>
               <textarea
-                id={`reply-${_id}`}
+                id={`reply-${contact._id}`}
                 rows="3"
-                className="w-full border p-2 rounded mb-2"
-                value={replyMap[_id] || ""}
-                onChange={(e) => handleReplyChange(_id, e.target.value)}
+                className="w-full border p-2 rounded"
+                value={replyMap[contact._id] || ""}
+                onChange={(e) => handleReplyChange(contact._id, e.target.value)}
               />
-              <button
-                onClick={() => handleReplySubmit(_id)}
-                disabled={loadingReply === _id}
-                className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1 rounded"
-              >
-                {loadingReply === _id ? "Saving..." : "Save Reply"}
-              </button>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => handleReplySubmit(contact._id)}
+                  // disabled={loadingReply === contact._id}
+                  disabled
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-1 rounded cursor-not-allowed"
+                >
+                  {loadingReply === contact._id ? "Saving..." : "Save Reply"}
+                </button>
+                {!contact.isRead && (
+                  <button
+                    onClick={() => handleMarkRead(contact._id)}
+                    className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
+                  >
+                    Mark as Read
+                  </button>
+                )}
+                <button
+                  onClick={() => handleDelete(contact._id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-1 rounded"
+                >
+                  Delete
+                </button>
+              </div>
 
-              {reply && repliedAt && (
-                <p className="mt-2 text-sm text-gray-600">
-                  Last replied: {new Date(repliedAt).toLocaleString()}
+              {contact.reply && contact.repliedAt && (
+                <p className="text-sm text-gray-600">
+                  Last replied: {new Date(contact.repliedAt).toLocaleString()}
                 </p>
               )}
             </div>
 
             <p className="mt-2 text-xs text-gray-400">
-              Received: {new Date(createdAt).toLocaleString()}
+              Received: {new Date(contact.createdAt).toLocaleString()}
             </p>
           </li>
         ))}

@@ -1,146 +1,199 @@
-import { useState } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
+import { fetchApi } from "@/utils/FetchApi";
+import { useSelector } from "react-redux";
+import Image from "next/image";
 
 export default function BlogsTab() {
-  const [blogs, setBlogs] = useState([
-    {
-      id: 1,
-      title: "How to Build a Modern Web App",
-      excerpt:
-        "Learn the step-by-step process of building a performant and responsive web app using the latest tools.",
-      image:
-        "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
-      author: "John Doe",
-      date: "June 28, 2025",
-    },
-    {
-      id: 2,
-      title: "UI/UX Trends to Watch in 2025",
-      excerpt:
-        "Explore the most important user experience and design trends shaping the digital landscape in 2025.",
-      image:
-        "https://media.istockphoto.com/id/1147544807/vector/thumbnail-image-vector-graphic.jpg?s=612x612&w=0&k=20&c=rnCKVbdxqkjlcs3xH87-9gocETqpspHFXu5dIGB4wuM=",
-      author: "Jane Smith",
-      date: "June 26, 2025",
-    },
-    // Add the remaining blogs...
-  ]);
-
-  const [form, setForm] = useState({ title: "", excerpt: "", image: "", author: "" });
+  const [blogs, setBlogs] = useState([]);
+  const [form, setForm] = useState({
+    title: "",
+    content: "",
+    image: null,
+    author: "",
+  });
   const [editId, setEditId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const user = useSelector((state) => state.auth.user);
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [loading]);
+
+  async function fetchBlogs() {
+    const res = await fetchApi("/blogs/", "GET");
+    if (res) {
+      const data = await res;
+      setBlogs(data);
+    }
+  }
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (editId) {
-      setBlogs((prev) =>
-        prev.map((blog) => (blog.id === editId ? { ...blog, ...form } : blog))
-      );
+    const { name, value, files } = e.target;
+    if (name === "image") {
+      setForm((prev) => ({ ...prev, image: files[0] }));
     } else {
-      setBlogs((prev) => [
-        { id: Date.now(), date: new Date().toLocaleDateString(), ...form },
-        ...prev,
-      ]);
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
-    setForm({ title: "", excerpt: "", image: "", author: "" });
-    setEditId(null);
   };
 
-  const handleDelete = (id) => {
-    setBlogs((prev) => prev.filter((blog) => blog.id !== id));
-  };
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
 
-  const handleEdit = (blog) => {
-    setForm({ title: blog.title, excerpt: blog.excerpt, image: blog.image, author: blog.author });
-    setEditId(blog.id);
-  };
+    try {
+      const method = editId ? "PUT" : "POST";
+      const url = editId ? `/blogs/${editId}` : "/blogs/create-blogs";
+
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("content", form.content);
+      if (form.image) {
+        formData.append("image", form.image);
+      }
+
+      const userId =
+        user?._id ||
+        (typeof window !== "undefined"
+          ? JSON.parse(localStorage.getItem("userInfo"))?._id
+          : null);
+
+      if (!userId) {
+        alert("User not logged in");
+        setLoading(false);
+        return;
+      }
+
+      formData.append("author", userId);
+
+      const res = await fetchApi(url, method, formData);
+
+      if (res) throw new Error("Failed");
+
+      setForm({ title: "", content: "", image: null, author: "" });
+      setEditId(null);
+      fetchBlogs();
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id) {
+    if (!confirm("Delete this blog?")) return;
+    await fetchApi(`/blogs/${id}`, "DELETE");
+    fetchBlogs();
+  }
+
+  function handleEdit(blog) {
+    setForm({
+      title: blog.title,
+      content: blog.content,
+      author: blog.author,
+      image: null,
+    });
+    setEditId(blog._id);
+  }
 
   return (
-    <div className="">
-      <h2 className="text-2xl font-bold mb-4">Manage Blogs</h2>
-
-      {/* Blog Form */}
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">Blogs</h2>
+      <form onSubmit={handleSubmit} className="mb-6 space-y-4 max-w-md">
         <input
-          type="text"
           name="title"
+          placeholder="Title"
           value={form.title}
           onChange={handleChange}
-          placeholder="Title"
-          className="p-2 border rounded"
+          className="w-full border p-2 rounded"
           required
         />
         <input
-          type="text"
-          name="author"
-          value={form.author}
-          onChange={handleChange}
-          placeholder="Author"
-          className="p-2 border rounded"
-          required
-        />
-        <input
-          type="text"
           name="image"
-          value={form.image}
+          type="file"
+          accept="image/*"
           onChange={handleChange}
-          placeholder="Image URL"
-          className="p-2 border rounded"
-          required
+          className="w-full border p-2 rounded"
+          required={editId ? false : true}
         />
         <textarea
-          name="excerpt"
-          value={form.excerpt}
+          name="content"
+          placeholder="Blog Content"
+          value={form.content}
           onChange={handleChange}
-          placeholder="Excerpt"
-          className="p-2 border rounded md:col-span-2"
+          className="w-full border p-2 rounded"
           required
-        ></textarea>
+        />
         <button
           type="submit"
-          className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded col-span-full"
+          disabled={loading}
+          className="bg-teal-600 text-white px-4 py-2 rounded"
         >
-          {editId ? "Update Blog" : "Add Blog"}
+          {loading
+            ? editId
+              ? "Updating..."
+              : "Adding..."
+            : editId
+            ? "Update Blog"
+            : "Add Blog"}
         </button>
+        {editId && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditId(null);
+              setForm({ title: "", content: "", image: null, author: "" });
+            }}
+            className="ml-2 px-4 py-2 rounded bg-red-600 text-white"
+          >
+            Cancel
+          </button>
+        )}
       </form>
 
-      {/* Blog Cards */}
-      <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {blogs.map((blog) => (
-          <div
-            key={blog.id}
-            className="bg-white rounded shadow-md overflow-hidden flex flex-col"
+      <ul className="space-y-3">
+        {!blogs?.length && <p>No blogs found.</p>}
+        {blogs?.map((blog) => (
+          <li
+            key={blog._id}
+            className="border rounded p-4 flex justify-between items-start"
           >
-            <img src={blog.image} alt={blog.title} className="h-48 w-full object-cover" />
-            <div className="p-4 flex flex-col justify-between flex-grow">
+            <div className="flex">
+              <Image
+                src={blog.image}
+                alt={blog.title}
+                width={300}
+                height={300}
+                className="w-28 h-28 object-cover mr-4"
+              />
               <div>
-                <h3 className="font-semibold text-lg mb-1">{blog.title}</h3>
-                <p className="text-sm text-gray-600 mb-2">{blog.excerpt}</p>
-              </div>
-              <div className="flex justify-between text-sm text-gray-500 mt-2">
-                <span>{blog.author}</span>
-                <span>{blog.date}</span>
-              </div>
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  onClick={() => handleEdit(blog)}
-                  className="text-blue-600 hover:underline"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(blog.id)}
-                  className="text-red-600 hover:underline"
-                >
-                  Delete
-                </button>
+                <h3 className="font-semibold">{blog.title}</h3>
+                <p className="text-sm text-gray-600">{blog.content}</p>
+                <p className="text-xs mt-2 text-gray-500">
+                  By: {blog.author?.username || "Unknown"}
+                </p>
               </div>
             </div>
-          </div>
+            <div className="space-x-2">
+              <button
+                onClick={() => handleEdit(blog)}
+                className="text-blue-600 hover:underline"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDelete(blog._id)}
+                className="text-red-600 hover:underline"
+              >
+                Delete
+              </button>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }

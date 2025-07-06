@@ -112,7 +112,15 @@ export default function Navbar() {
                 <ul className="flex flex-col p-4 space-y-3">
                   {navItems.map((item) => {
                     const isActive =
-                      pathname === item.href ||
+                      (item.href === "/" && pathname === "/") ||
+                      (item.href === "/blogs" &&
+                        pathname.startsWith("/blogs")) ||
+                      (item.href === "/services" &&
+                        pathname.startsWith("/services")) ||
+                      (item.href === "/offers" &&
+                        pathname.startsWith("/offers")) ||
+                      (item.href === "/auth/dashboard" &&
+                        pathname === "/auth/dashboard") ||
                       (item.href.startsWith("/#") && pathname === "/");
 
                     return (
