@@ -169,15 +169,15 @@ export default function BlogsTab() {
                 height={300}
                 className="w-28 h-28 object-cover mr-4"
               />
-              <div>
+              <div className="max-w-2/3">
                 <h3 className="font-semibold">{blog.title}</h3>
-                <p className="text-sm text-gray-600">{blog.content}</p>
+                <p className="text-sm text-gray-600 line-clamp-5">{blog.content}</p>
                 <p className="text-xs mt-2 text-gray-500">
                   By: {blog.author?.username || "Unknown"}
                 </p>
               </div>
             </div>
-            <div className="space-x-2">
+            <div className="flex space-x-2">
               <button
                 onClick={() => handleEdit(blog)}
                 className="text-blue-600 hover:underline"

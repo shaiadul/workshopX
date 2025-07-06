@@ -169,7 +169,7 @@ export default function ServicesTab() {
             key={service._id}
             className="border rounded p-4 flex justify-between items-start"
           >
-            <div className="flex ">
+            <div className="flex">
               <Image
                 src={service.image}
                 alt={service.title}
@@ -177,12 +177,12 @@ export default function ServicesTab() {
                 height={300}
                 className="w-28 h-28 object-cover mr-4"
               />
-              <div>
+              <div className="max-w-2/3">
                 <h3 className="font-semibold">{service.title}</h3>
-                <p>{service.description}</p>
+                <p className="line-clamp-3">{service.description}</p>
               </div>
             </div>
-            <div className="space-x-2">
+            <div className="flex space-x-2">
               <button
                 onClick={() => handleEdit(service)}
                 className="text-blue-600 hover:underline"

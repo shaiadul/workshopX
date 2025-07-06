@@ -196,15 +196,15 @@ export default function OfferTab() {
                   className="w-24 h-24 object-cover mr-4 rounded"
                 />
               )}
-              <div>
+              <div className="max-w-2/3">
                 <h3 className="text-lg font-bold">{offer.title}</h3>
-                <p className="text-sm text-gray-700">{offer.description}</p>
+                <p className="text-sm text-gray-700 line-clamp-3">{offer.description}</p>
                 <p className="text-xs text-gray-500 mt-2">
                   Expire Date: {new Date(offer.expireAt).toLocaleDateString()}
                 </p>
               </div>
             </div>
-            <div className="space-x-2 mt-2">
+            <div className="flex space-x-2 mt-2">
               <button
                 onClick={() => handleEdit(offer)}
                 className="text-blue-600 hover:underline"

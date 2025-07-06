@@ -28,7 +28,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default async function BlogDetails({ params }) {
+export default async function ServicesDetails({ params }) {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_ENDPOINT}/services/${params.id}`,
     {

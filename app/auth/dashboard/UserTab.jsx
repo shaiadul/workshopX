@@ -78,11 +78,22 @@ export default function UserTab() {
         </thead>
         <tbody>
           {users.map(
-            ({ _id, username, email, role, isVerified, isBlocked, isDeleted }) => (
+            ({
+              _id,
+              username,
+              email,
+              role,
+              isVerified,
+              isBlocked,
+              isDeleted,
+            }) => (
               <tr key={_id} className="border-b">
                 <td className="p-2 border">{username}</td>
                 <td className="p-2 border">{email}</td>
-                <td className="p-2 border">{isDeleted ? "Deleted" : "Not Deleted"}</td>
+                {/* <td className="p-2 border bg-red-300">{isDeleted ? "Deleted" : "Not Deleted"}</td> */}
+                <td className={`p-2 border ${isDeleted ? "bg-red-100" : ""}`}>
+                  {isDeleted ? "Deleted" : "Not Deleted"}
+                </td>
                 <td className="p-2 border">
                   <span
                     className={`px-2 py-1 rounded text-xs font-medium ${

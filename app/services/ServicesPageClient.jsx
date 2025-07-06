@@ -58,7 +58,7 @@ export default function ServicesPageClient() {
               <h4 className="text-xl font-semibold text-slate-900 mb-2">
                 {service.title}
               </h4>
-              <p className="text-slate-600 text-sm leading-relaxed">
+              <p className="text-slate-600 text-sm leading-relaxed line-clamp-2">
                 {service.description}
               </p>
             </motion.div>

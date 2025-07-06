@@ -23,7 +23,7 @@ useEffect(() => {
           <h1 data-aos="fade-right" className="text-3xl font-bold text-teal-700">{offer.title}</h1>
           <p data-aos="fade-left" className="text-gray-700">{offer.description}</p>
           <p data-aos="fade-right" className="text-sm text-gray-500 italic">
-            Posted on: {offer.date}
+            Posted on: {new Date(offer.createdAt).toLocaleString()}
           </p>
         </div>
       </div>
