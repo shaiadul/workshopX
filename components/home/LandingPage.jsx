@@ -511,6 +511,84 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      
+      <section className="w-full py-20 px-4 md:px-12">
+        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center gap-10">
+          <div className="w-full md:w-2/3 text-center md:text-left">
+            <h2
+              data-aos="fade-right"
+              className="text-3xl md:text-4xl font-bold text-gray-800 mb-3"
+            >
+              Meet Our Chairman
+            </h2>
+            <p
+              data-aos="fade-left"
+              className="text-xl font-semibold text-teal-600 mb-2"
+            >
+              Mr. Abdul Karim Chowdhury (CEO)
+            </p>
+            <p
+              data-aos="fade-up"
+              className="text-gray-700 mb-6 leading-relaxed"
+            >
+              Mr. Abdul Karim is the visionary leader behind our organization’s
+              growth and innovation. With over 30 years of experience in the
+              logistics and supply chain industry, he has led with integrity,
+              strategy, and a strong commitment to service excellence. Under his
+              leadership, we have reached new milestones in efficiency and
+              customer satisfaction.
+            </p>
+
+            <p
+              data-aos="fade-up"
+              className="text-gray-700 mb-6 leading-relaxed"
+            >
+              With over 30 years of experience in the logistics and supply chain
+              industry, he has led with integrity, strategy, and a strong
+              commitment to service excellence. Under his leadership, we have
+              reached new milestones in efficiency and customer satisfaction.
+            </p>
+
+            <Link
+              href="/chairman-profile"
+              className="inline-block text-teal-600 font-semibold underline underline-offset-4 hover:text-teal-800 transition duration-300"
+            >
+              View Full Profile
+            </Link>
+          </div>
+          <div
+            data-aos="fade-right"
+            className="relative w-full md:w-1/3 h-72 md:h-96 rounded-xl overflow-hidden shadow-lg order-first md:order-last"
+          >
+            <Image
+              // src={boss}
+              src="https://i.pravatar.cc/100?img=2"
+              alt="Chairman"
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-teal-600 text-white py-20 px-4 text-center">
+        <div className="max-w-3xl mx-auto">
+          <h2 data-aos="fade-up" className="text-4xl font-bold mb-4">
+            Professional Workshop Services
+          </h2>
+          <p data-aos="fade-up" className="text-lg mb-6">
+            Expert repair, diagnostics, and maintenance — reliable and fast.
+          </p>
+          <a
+            data-aos="fade-up"
+            href="#contact"
+            className="bg-white text-teal-700 px-6 py-3 rounded-md font-medium hover:bg-gray-100"
+          >
+            Book a Service
+          </a>
+        </div>
+      </section>
 
       <section className="p-4 py-20 max-w-6xl mx-auto">
         <div className="max-w-2xl mx-auto text-center">
@@ -725,83 +803,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="bg-teal-600 text-white py-20 px-4 text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 data-aos="fade-up" className="text-4xl font-bold mb-4">
-            Professional Workshop Services
-          </h2>
-          <p data-aos="fade-up" className="text-lg mb-6">
-            Expert repair, diagnostics, and maintenance — reliable and fast.
-          </p>
-          <a
-            data-aos="fade-up"
-            href="#contact"
-            className="bg-white text-teal-700 px-6 py-3 rounded-md font-medium hover:bg-gray-100"
-          >
-            Book a Service
-          </a>
-        </div>
-      </section>
-
-      <section className="w-full py-20 px-4 md:px-12">
-        <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center gap-10">
-          <div className="w-full md:w-2/3 text-center md:text-left">
-            <h2
-              data-aos="fade-right"
-              className="text-3xl md:text-4xl font-bold text-gray-800 mb-3"
-            >
-              Meet Our Chairman
-            </h2>
-            <p
-              data-aos="fade-left"
-              className="text-xl font-semibold text-teal-600 mb-2"
-            >
-              Mr. Abdul Karim Chowdhury (CEO)
-            </p>
-            <p
-              data-aos="fade-up"
-              className="text-gray-700 mb-6 leading-relaxed"
-            >
-              Mr. Abdul Karim is the visionary leader behind our organization’s
-              growth and innovation. With over 30 years of experience in the
-              logistics and supply chain industry, he has led with integrity,
-              strategy, and a strong commitment to service excellence. Under his
-              leadership, we have reached new milestones in efficiency and
-              customer satisfaction.
-            </p>
-
-            <p
-              data-aos="fade-up"
-              className="text-gray-700 mb-6 leading-relaxed"
-            >
-              With over 30 years of experience in the logistics and supply chain
-              industry, he has led with integrity, strategy, and a strong
-              commitment to service excellence. Under his leadership, we have
-              reached new milestones in efficiency and customer satisfaction.
-            </p>
-
-            <Link
-              href="/chairman-profile"
-              className="inline-block text-teal-600 font-semibold underline underline-offset-4 hover:text-teal-800 transition duration-300"
-            >
-              View Full Profile
-            </Link>
-          </div>
-          <div
-            data-aos="fade-right"
-            className="relative w-full md:w-1/3 h-72 md:h-96 rounded-xl overflow-hidden shadow-lg order-first md:order-last"
-          >
-            <Image
-              // src={boss}
-              src="https://i.pravatar.cc/100?img=2"
-              alt="Chairman"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
-        </div>
-      </section>
+      <ClientLogoMarquee />
 
       <section id="testimonials" className="py-20 px-4 bg-gray-100">
         <div className="max-w-5xl mx-auto text-center">
@@ -830,8 +832,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <ClientLogoMarquee />
 
       <section className="mb-32">
         <div

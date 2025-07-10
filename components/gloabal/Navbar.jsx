@@ -20,6 +20,7 @@ export default function Navbar() {
     { label: "Services", href: "/services" },
     { label: "Offers", href: "/offers" },
     { label: "Contact", href: "/#contact" },
+    { label: "About Us", href: "/aboutus" },
   ];
 
   if (user?.email) {
@@ -31,7 +32,7 @@ export default function Navbar() {
       {/* Top contact bar */}
       <div className="bg-teal-400">
         <div className="container mx-auto px-5 text-gray-700 text-sm py-2 flex justify-between items-center">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center ml-auto gap-4">
             <a
               href="tel:+880123456789"
               className="flex items-center gap-1 hover:underline"
@@ -70,6 +71,7 @@ export default function Navbar() {
                 (item.href === "/services" &&
                   pathname.startsWith("/services")) ||
                 (item.href === "/offers" && pathname.startsWith("/offers")) ||
+                (item.href === "/aboutus" && pathname === "/aboutus") ||
                 (item.href === "/auth/dashboard" &&
                   pathname === "/auth/dashboard") ||
                 (item.href.startsWith("/#") && pathname === "/");
@@ -119,6 +121,7 @@ export default function Navbar() {
                         pathname.startsWith("/services")) ||
                       (item.href === "/offers" &&
                         pathname.startsWith("/offers")) ||
+                      (item.href === "/aboutus" && pathname === "/aboutus") ||
                       (item.href === "/auth/dashboard" &&
                         pathname === "/auth/dashboard") ||
                       (item.href.startsWith("/#") && pathname === "/");
